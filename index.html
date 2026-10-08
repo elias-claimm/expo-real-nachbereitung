@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>claim.m · EXPO REAL 2026 · Nachbereitung</title>
+  <style>
+    :root { --red:#ed1c24; --red-dark:#bd151c; --ink:#202124; --muted:#657078; --line:#dce0e4; --bg:#f5f6f7; --card:#fff; --soft:#fff3f3; --amber:#fff2d5; --green:#e8f5ea; --blue:#e7f0fc; font-family:Arial,Helvetica,sans-serif; color:var(--ink); }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); min-width:320px; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    .topbar { background:#202020; border-bottom:4px solid var(--red); color:#fff; }
+    .topinner { max-width:1700px; margin:auto; min-height:82px; padding:18px 26px; display:flex; align-items:center; gap:26px; }
+    .logo { width:188px; max-height:46px; object-fit:contain; object-position:left center; }
+    .brandtext { font-size:28px; font-weight:700; letter-spacing:-1.4px; white-space:nowrap; }
+    .brandtext em { color:var(--red); font-style:normal; }
+    .titleblock h1 { margin:0 0 5px; font-size:21px; line-height:1.1; }
+    .titleblock p { margin:0; color:#d0d0d0; font-size:13px; }
+    .shell { max-width:1700px; margin:0 auto; padding:22px 26px 32px; }
+    .notice { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-bottom:18px; color:#575d64; font-size:13px; line-height:1.45; }
+    .notice strong { color:#202124; }
+    .saveflag { white-space:nowrap; font-weight:700; color:#366d3c; }
+    .saveflag.error { color:#b92028; }
+    .metrics { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:19px; }
+    .metric { background:var(--card); border:1px solid var(--line); border-top:3px solid var(--red); border-radius:8px; padding:13px 15px; box-shadow:0 1px 3px #0000000a; }
+    .metric .number { font-size:28px; font-weight:700; line-height:1; margin-bottom:6px; }
+    .metric .label { font-size:12px; color:var(--muted); line-height:1.25; }
+    .toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:16px; }
+    .tools-left,.tools-right { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+    .toolbar input,.toolbar select { min-height:38px; border:1px solid #cdd3d8; background:#fff; border-radius:6px; padding:8px 10px; }
+    #search { width:min(330px,72vw); }
+    .btn { border:1px solid #c8cdd2; border-radius:6px; background:#fff; color:#252525; min-height:38px; padding:8px 12px; font-size:13px; font-weight:700; }
+    .btn:hover { border-color:#929aa2; background:#fafafa; }
+    .btn.primary { background:var(--red); color:#fff; border-color:var(--red); }
+    .btn.primary:hover { background:var(--red-dark); }
+    .btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.item:focus-visible { outline:3px solid #f4a2a5; outline-offset:2px; }
+    .workspace { display:grid; grid-template-columns:minmax(370px,0.98fr) minmax(560px,1.22fr); align-items:start; gap:16px; }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:9px; box-shadow:0 2px 10px #0000000a; min-width:0; }
+    .panelhead { padding:16px 18px 13px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+    .panelhead h2 { margin:0; font-size:16px; }
+    .panelhead span { font-size:12px; color:var(--muted); }
+    .listhead { display:grid; grid-template-columns:130px minmax(160px,1fr) 132px; gap:10px; padding:10px 17px; background:#f3f4f5; color:#5b6268; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    #companyList { max-height:calc(100vh - 305px); min-height:300px; overflow-y:auto; }
+    .item { width:100%; display:grid; grid-template-columns:130px minmax(160px,1fr) 132px; align-items:center; gap:10px; padding:12px 17px; border:0; border-top:1px solid #edf0f2; text-align:left; background:#fff; color:inherit; }
+    .item:hover { background:#fafafa; }
+    .item.selected { background:#fff4f4; box-shadow:inset 4px 0 var(--red); }
+    .item .owner { font-size:12px; color:#626a70; }
+    .item .company { font-size:13px; font-weight:700; line-height:1.25; overflow-wrap:anywhere; }
+    .item .sub { display:block; color:#7a8289; font-size:11px; margin-top:3px; font-weight:400; }
+    .badge { display:inline-block; padding:5px 8px; border-radius:4px; font-size:11px; line-height:1.15; font-weight:700; text-align:center; background:#eef0f2; color:#54606a; }
+    .badge.warn { background:var(--amber); color:#815300; }
+    .badge.danger { background:#fde6e7; color:#aa2028; }
+    .badge.good { background:var(--green); color:#2c7039; }
+    .badge.info { background:var(--blue); color:#245184; }
+    .empty { padding:30px 18px; text-align:center; color:var(--muted); font-size:13px; }
+    .editor { position:sticky; top:14px; max-height:calc(100vh - 28px); overflow:auto; }
+    .editor-title { padding:17px 20px 13px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:start; gap:12px; }
+    .editor-title h2 { margin:0 0 4px; font-size:20px; line-height:1.2; }
+    .editor-title p { margin:0; color:var(--muted); font-size:12px; }
+    .editor-body { padding:5px 20px 22px; }
+    .section { border:0; padding:0; margin:15px 0 0; border-top:1px solid var(--line); }
+    .section legend { padding:0 8px 0 0; font-size:13px; color:#b21920; font-weight:700; }
+    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 14px; margin-top:12px; }
+    .field { min-width:0; display:flex; flex-direction:column; gap:5px; }
+    .field.wide { grid-column:1 / -1; }
+    .field label { font-size:11px; font-weight:700; color:#46515b; }
+    .field input,.field select,.field textarea { width:100%; min-height:36px; border:1px solid #cfd4d9; border-radius:5px; background:#fff; padding:8px 9px; font-size:13px; color:#222; }
+    .field textarea { resize:vertical; min-height:72px; line-height:1.45; }
+    .field input[readonly] { background:#f5f6f7; color:#60666d; }
+    .field small { font-size:10px; color:#6a737b; line-height:1.35; }
+    .editor-foot { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:13px 20px 17px; border-top:1px solid var(--line); background:#fafafa; font-size:12px; color:#6b737b; }
+    .editor-foot strong { color:#2e6938; }
+    .helper { max-width:1700px; margin:8px auto 0; padding:0 26px 24px; font-size:12px; line-height:1.5; color:#626a70; }
+    .helper a { color:#a71920; }
+    #importFile { display:none; }
+    @media (max-width:1150px) { .workspace { grid-template-columns:minmax(320px,1fr) minmax(440px,1.1fr); } .metrics { grid-template-columns:repeat(3,minmax(0,1fr)); } .item,.listhead { grid-template-columns:95px minmax(120px,1fr) 110px; gap:7px; } }
+    @media (max-width:820px) { .topinner { padding:16px; } .shell { padding:16px; } .workspace { grid-template-columns:1fr; } .editor { position:static; max-height:none; } #companyList { max-height:360px; } .helper { padding:0 16px 20px; } .notice { align-items:start; } }
+    @media (max-width:560px) { .topinner { gap:12px; } .logo { width:125px; } .brandtext { font-size:22px; } .titleblock h1 { font-size:16px; } .titleblock p { font-size:11px; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .notice { display:block; } .saveflag { display:block; margin-top:5px; } .fields { grid-template-columns:1fr; } .listhead,.item { grid-template-columns:1fr 104px; } .listhead span:first-child,.item .owner { display:none; } .editor-title { display:block; } .editor-title .badge { margin-top:9px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topinner">
+      <img class="logo" src="data:image/png;base64,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" alt="claim.m" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span class="brandtext" style="display:none">claim.<em>m</em></span>
+      <div class="titleblock"><h1>EXPO REAL 2026 · Nachbereitung</h1><p>Gespräche, Follow-ups und Projektchancen</p></div>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="notice">
+      <div><strong>Arbeitsliste für die Messegespräche vom 5. und 6. Oktober.</strong> Die Eingaben werden automatisch in SharePoint gespeichert und mit allen abgeglichen. Bitte regelmäßig eine JSON-Sicherung herunterladen.</div>
+      <span id="saveFlag" class="saveflag" role="status" aria-live="polite">Bereit</span>
+    </div>
+    <section class="metrics" aria-label="Bearbeitungsstand">
+      <div class="metric"><div id="metricMeetings" class="number">0</div><div class="label">Gespräche geführt</div></div>
+      <div class="metric"><div id="metricFollowups" class="number">0</div><div class="label">Follow-ups offen</div></div>
+      <div class="metric"><div id="metricOverdue" class="number">0</div><div class="label">davon überfällig</div></div>
+      <div class="metric"><div id="metricOpportunities" class="number">0</div><div class="label">Projektchancen</div></div>
+      <div class="metric"><div id="metricNextMeetings" class="number">0</div><div class="label">Folgetermine</div></div>
+    </section>
+    <div class="toolbar">
+      <div class="tools-left">
+        <input id="search" type="search" placeholder="Firma oder Gesprächspartner suchen" aria-label="Firma oder Gesprächspartner suchen">
+        <select id="ownerFilter" aria-label="Nach Teammitglied filtern"><option value="">Alle Teammitglieder</option></select>
+        <select id="statusFilter" aria-label="Nach Arbeitsstand filtern">
+          <option value="">Alle Arbeitsstände</option><option value="offen">Offen</option><option value="followup">Follow-up offen</option><option value="uebergabe">Übergabe offen</option><option value="erledigt">Abgeschlossen</option><option value="kein-gespraech">Kein Gespräch</option>
+        </select>
+      </div>
+      <div class="tools-right">
+        <button id="addButton" class="btn primary" type="button">+ Gespräch hinzufügen</button>
+        <button id="jsonButton" class="btn" type="button">JSON-Sicherung</button>
+        <button id="csvButton" class="btn" type="button">CSV für Excel</button>
+        <button id="importButton" class="btn" type="button">JSON laden</button>
+        <input id="importFile" type="file" accept="application/json,.json">
+      </div>
+    </div>
+    <div class="workspace">
+      <section class="panel" aria-label="Unternehmensliste">
+        <div class="panelhead"><h2>Unternehmen</h2><span id="listCount"></span></div>
+        <div class="listhead"><span>Verantwortlich</span><span>Unternehmen</span><span>Arbeitsstand</span></div>
+        <div id="companyList"></div>
+      </section>
+      <section class="panel editor" aria-label="Eintrag bearbeiten">
+        <div class="editor-title"><div><h2 id="editorCompany">Eintrag auswählen</h2><p id="editorSub">Die Angaben können jederzeit ergänzt werden.</p></div><span id="editorStatus" class="badge">Offen</span></div>
+        <form id="editorForm" class="editor-body" autocomplete="off">
+          <fieldset class="section"><legend>Kontakt</legend><div class="fields">
+            <div class="field wide"><label for="company">Unternehmen</label><input id="company" data-field="company" type="text"></div>
+            <div class="field"><label for="owner">Verantwortlich bei claim.m</label><input id="owner" data-field="owner" type="text" placeholder="Selbst eintragen"></div>
+            <div class="field"><label for="area">Leistungsbereich</label><input id="area" data-field="area" type="text"></div>
+            <div class="field"><label for="person">Gesprächspartner</label><input id="person" data-field="person" type="text" placeholder="Selbst eintragen"></div>
+            <div class="field"><label for="position">Position</label><input id="position" data-field="position" type="text"></div>
+            <div class="field"><label for="email">E-Mail</label><input id="email" data-field="email" type="email"></div>
+            <div class="field"><label for="phone">Telefon</label><input id="phone" data-field="phone" type="tel"></div>
+          </div></fieldset>
+          <fieldset class="section"><legend>Messegespräch</legend><div class="fields">
+            <div class="field"><label for="meetingAt">Datum und Uhrzeit</label><input id="meetingAt" data-field="meetingAt" type="datetime-local"></div>
+            <div class="field"><label for="meetingHeld">Gespräch geführt?</label><select id="meetingHeld" data-field="meetingHeld"><option value="">Bitte wählen</option><option>Ja</option><option>Nein</option></select></div>
+            <div class="field wide"><label for="result">Ergebnis</label><select id="result" data-field="result"><option value="">Bitte wählen</option><option>Weiterer Austausch</option><option>Konkrete Projektchance</option><option>Nachfassen</option><option>Kein aktueller Bedarf</option><option>Kooperationsmöglichkeit</option><option>Sonstiges</option></select></div>
+            <div class="field wide"><label for="meetingNotes">Gesprächsnotiz</label><textarea id="meetingNotes" data-field="meetingNotes" placeholder="Was wurde besprochen? Was wurde zugesagt?"></textarea></div>
+          </div></fieldset>
+          <fieldset class="section"><legend>Persönliches Follow-up</legend><div class="fields">
+            <div class="field"><label for="followupRequired">Follow-up erforderlich?</label><select id="followupRequired" data-field="followupRequired"><option value="">Bitte wählen</option><option>Ja</option><option>Nein</option></select></div>
+            <div class="field"><label for="followupDueOverride">Follow-up fällig bis</label><input id="followupDueOverride" data-field="followupDueOverride" type="date"><small>Vorschlag: zwei Werktage nach dem Gespräch. Feiertage bitte selbst berücksichtigen.</small></div>
+            <div class="field"><label for="followupSentAt">Follow-up gesendet am</label><input id="followupSentAt" data-field="followupSentAt" type="date"></div>
+            <div class="field"><label for="nextMeetingAt">Folgetermin</label><input id="nextMeetingAt" data-field="nextMeetingAt" type="datetime-local"></div>
+          </div></fieldset>
+          <fieldset class="section"><legend>Projektchance und Übergabe</legend><div class="fields">
+            <div class="field"><label for="opportunity">Konkrete Projektchance?</label><select id="opportunity" data-field="opportunity"><option value="">Bitte wählen</option><option>Ja</option><option>Nein</option></select></div>
+            <div class="field"><label for="handoverTo">Übergabe an</label><select id="handoverTo" data-field="handoverTo"></select></div>
+            <div class="field wide"><label for="projectNeed">Projekt / Bedarf</label><textarea id="projectNeed" data-field="projectNeed" placeholder="Projekt, Bedarf, Umfang und nächster fachlicher Schritt"></textarea></div>
+            <div class="field"><label for="handoverAt">Übergabe erfolgt am</label><input id="handoverAt" data-field="handoverAt" type="date"></div>
+          </div></fieldset>
+          <fieldset class="section"><legend>Nächster Schritt</legend><div class="fields">
+            <div class="field wide"><label for="nextStep">Aufgabe</label><input id="nextStep" data-field="nextStep" type="text" placeholder="Zum Beispiel Unterlagen senden oder Folgetermin abstimmen"></div>
+            <div class="field"><label for="nextStepDue">Frist</label><input id="nextStepDue" data-field="nextStepDue" type="date"></div>
+            <div class="field"><label for="completed">Nachbereitung abgeschlossen?</label><select id="completed" data-field="completed"><option value="">Bitte wählen</option><option>Ja</option><option>Nein</option></select></div>
+          </div></fieldset>
+        </form>
+        <div class="editor-foot"><span>Änderungen werden automatisch gespeichert.</span><strong id="editorSaved">Bereit</strong></div>
+      </section>
+    </div>
+  </main>
+  <div class="helper">Hinweis: Diese Datei speichert Eingaben lokal im verwendeten Browser. Für einen anderen Rechner oder Browser die JSON-Sicherung herunterladen und dort über „JSON laden“ importieren. Die CSV-Datei eignet sich für Excel, die JSON-Datei für eine vollständige Sicherung der Bearbeitung.</div>
+  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
+  <script src="config.js"></script>
+  <script src="sharepoint-sync.js"></script>
+  <script>
+    "use strict";
+    const SEED = [];
+    const LEGACY_DEFAULTS = {};
+    const STORAGE_KEY = "claimm.expo-real-2026.nachbereitung.v1";
+    const fields = ["owner","area","company","person","position","email","phone","meetingAt","meetingHeld","result","meetingNotes","followupRequired","followupDueOverride","followupSentAt","nextMeetingAt","opportunity","projectNeed","handoverTo","handoverAt","nextStep","nextStepDue","completed"];
+    const people = ["Michal Gamalski","Marco Richter","Lisa Kreutzer","Alison Gil-Vargas","Benjamin Thumberger"];
+    const el = id => document.getElementById(id);
+    const todayISO = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`; };
+    const trim = value => typeof value === "string" ? value.trim() : "";
+
+    function normalize(item, index) {
+      const result = { id: trim(item?.id) || `import-${index + 1}` };
+      result.updatedAt = trim(item?.updatedAt);
+      for (const field of fields) result[field] = trim(item?.[field]);
+      return result;
+    }
+    function migrateLegacyDefaults(items) {
+      return items.map((item, index) => {
+        const record = normalize(item, index);
+        const previous = LEGACY_DEFAULTS[record.id];
+        if (previous) {
+          if (record.owner === previous.owner) record.owner = "";
+          if (record.person === previous.person) record.person = "";
+        }
+        return record;
+      });
+    }
+    function initialRecords() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (saved && Array.isArray(saved.records) && saved.records.length) {
+          const schemaVersion = saved.schemaVersion || 1;
+          const records = schemaVersion < 2 ? migrateLegacyDefaults(saved.records) : saved.records.map(normalize);
+          if (schemaVersion < 3) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, schemaVersion:3, records })); }
+            catch (_) { /* Gespeicherte Eingaben trotzdem anzeigen. */ }
+          }
+          return records;
+        }
+      } catch (_) { /* Initialdaten bleiben verfügbar. */ }
+      return SEED.map(normalize);
+    }
+    let records = initialRecords();
+    let selectedId = records[0]?.id || null;
+    let saveTimer = null;
+
+    function setSaveMessage(message, error = false) {
+      el("saveFlag").textContent = message;
+      el("saveFlag").classList.toggle("error", error);
+      el("editorSaved").textContent = message;
+    }
+    function saveNow() {
+      clearTimeout(saveTimer);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version:1, schemaVersion:3, savedAt:new Date().toISOString(), records }));
+        if (window.SPSync && SPSync.active) { SPSync.queueSave(); return; }
+        setSaveMessage(`Gespeichert um ${new Date().toLocaleTimeString("de-DE", {hour:"2-digit",minute:"2-digit"})}`);
+      } catch (_) {
+        setSaveMessage("Speichern im Browser nicht möglich – bitte JSON-Sicherung herunterladen", true);
+      }
+    }
+    function queueSave() {
+      setSaveMessage("Speichere …");
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveNow, 180);
+    }
+    function addBusinessDays(datePart, amount) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart || "")) return "";
+      const date = new Date(`${datePart}T12:00:00Z`);
+      if (Number.isNaN(date.getTime())) return "";
+      let remaining = amount;
+      while (remaining > 0) {
+        date.setUTCDate(date.getUTCDate() + 1);
+        const weekday = date.getUTCDay();
+        if (weekday !== 0 && weekday !== 6) remaining -= 1;
+      }
+      return date.toISOString().slice(0, 10);
+    }
+    function dueDate(record) {
+      if (record.meetingHeld !== "Ja" || record.followupRequired !== "Ja") return "";
+      return record.followupDueOverride || addBusinessDays(record.meetingAt.slice(0,10), 2);
+    }
+    function status(record) {
+      if (record.meetingHeld === "Nein") return { text:"Kein Gespräch", kind:"plain", key:"kein-gespraech" };
+      if (record.meetingHeld !== "Ja") return { text:"Gespräch erfassen", kind:"plain", key:"offen" };
+      if (record.followupRequired === "Ja" && !record.followupSentAt) {
+        const due = dueDate(record);
+        return due && due < todayISO()
+          ? { text:"Follow-up überfällig", kind:"danger", key:"followup" }
+          : { text:"Follow-up offen", kind:"warn", key:"followup" };
+      }
+      if (record.opportunity === "Ja" && (!record.handoverTo || !record.handoverAt)) return { text:"Übergabe offen", kind:"danger", key:"uebergabe" };
+      if (record.completed === "Ja" && record.followupRequired && record.opportunity) return { text:"Abgeschlossen", kind:"good", key:"erledigt" };
+      if (record.nextMeetingAt) return { text:"Folgetermin vereinbart", kind:"info", key:"offen" };
+      return { text:"Nachbereitung offen", kind:"warn", key:"offen" };
+    }
+    function displayDate(value) {
+      if (!value) return "";
+      const [y,m,d] = value.slice(0,10).split("-");
+      return y && m && d ? `${d}.${m}.${y}` : value;
+    }
+    function currentRecord() { return records.find(record => record.id === selectedId) || null; }
+    function badgeFor(record) {
+      const info = status(record);
+      const span = document.createElement("span");
+      span.className = `badge ${info.kind}`;
+      span.textContent = info.text;
+      return span;
+    }
+    function renderMetrics() {
+      const held = records.filter(r => r.meetingHeld === "Ja");
+      const followups = held.filter(r => r.followupRequired === "Ja" && !r.followupSentAt);
+      el("metricMeetings").textContent = held.length;
+      el("metricFollowups").textContent = followups.length;
+      el("metricOverdue").textContent = followups.filter(r => dueDate(r) && dueDate(r) < todayISO()).length;
+      el("metricOpportunities").textContent = held.filter(r => r.opportunity === "Ja").length;
+      el("metricNextMeetings").textContent = held.filter(r => r.nextMeetingAt).length;
+    }
+    function renderOwners() {
+      const currentFilter = el("ownerFilter").value;
+      const currentHandover = el("handoverTo").value;
+      const enteredOwners = [...new Set(records.map(r => r.owner).filter(Boolean))].sort((a,b) => a.localeCompare(b,"de"));
+      for (const id of ["ownerFilter","handoverTo"]) {
+        const select = el(id);
+        select.replaceChildren();
+        const first = document.createElement("option");
+        first.value = "";
+        first.textContent = id === "ownerFilter" ? "Alle Teammitglieder" : "Bitte wählen";
+        select.append(first);
+        for (const person of (id === "ownerFilter" ? enteredOwners : [...new Set([...people, ...enteredOwners])])) {
+          const option = document.createElement("option");
+          option.value = option.textContent = person;
+          select.append(option);
+        }
+      }
+      el("ownerFilter").value = currentFilter;
+      el("handoverTo").value = currentHandover;
+    }
+    function filteredRecords() {
+      const query = el("search").value.trim().toLocaleLowerCase("de-DE");
+      const owner = el("ownerFilter").value;
+      const statusKey = el("statusFilter").value;
+      return records.filter(record => {
+        if (owner && record.owner !== owner) return false;
+        if (statusKey && status(record).key !== statusKey) return false;
+        if (query && ![record.company,record.person,record.position,record.projectNeed].join(" ").toLocaleLowerCase("de-DE").includes(query)) return false;
+        return true;
+      }).sort((a,b) => a.company.localeCompare(b.company,"de"));
+    }
+    function renderList() {
+      const visible = filteredRecords();
+      el("listCount").textContent = `${visible.length} von ${records.length} Einträgen`;
+      const fragment = document.createDocumentFragment();
+      if (!visible.length) {
+        const empty = document.createElement("div"); empty.className = "empty";
+        empty.textContent = "Keine passenden Einträge. Suche oder Filter ändern.";
+        fragment.append(empty);
+      }
+      for (const record of visible) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `item${record.id === selectedId ? " selected" : ""}`;
+        button.dataset.id = record.id;
+        const owner = document.createElement("span"); owner.className = "owner"; owner.textContent = record.owner || "–";
+        const company = document.createElement("span"); company.className = "company"; company.textContent = record.company || "Neuer Eintrag";
+        const sub = document.createElement("span"); sub.className = "sub";
+        sub.textContent = [record.person, displayDate(record.meetingAt)].filter(Boolean).join(" · ") || record.area || "Noch keine Gesprächsangaben";
+        company.append(sub);
+        button.append(owner, company, badgeFor(record));
+        button.addEventListener("click", () => { selectedId = record.id; renderList(); renderEditor(); if (window.matchMedia("(max-width: 820px)").matches) document.querySelector(".editor").scrollIntoView({behavior:"smooth",block:"start"}); });
+        fragment.append(button);
+      }
+      el("companyList").replaceChildren(fragment);
+    }
+    function renderEditor() {
+      const record = currentRecord();
+      const form = el("editorForm");
+      form.hidden = !record;
+      if (!record) return;
+      el("editorCompany").textContent = record.company || "Neuer Eintrag";
+      el("editorSub").textContent = [record.owner,record.area].filter(Boolean).join(" · ") || "Angaben ergänzen";
+      el("editorStatus").replaceWith(badgeFor(record));
+      const badge = document.querySelector(".editor-title .badge");
+      badge.id = "editorStatus";
+      for (const field of fields) {
+        const control = form.querySelector(`[data-field="${field}"]`);
+        if (control) control.value = record[field] || "";
+      }
+      const dueInput = el("followupDueOverride");
+      dueInput.placeholder = dueDate(record) || "";
+      dueInput.parentElement.querySelector("small").textContent = dueDate(record)
+        ? `Vorschlag: ${displayDate(dueDate(record))} (zwei Werktage). Feiertage bei Bedarf anpassen.`
+        : "Vorschlag: zwei Werktage nach dem Gespräch. Feiertage bitte selbst berücksichtigen.";
+    }
+    function download(filename, text, type) {
+      const blob = new Blob([text], {type});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    function exportJSON() {
+      saveNow();
+      download(`claimm_EXPO_REAL_2026_Nachbereitung_${todayISO()}.json`, JSON.stringify({version:1,schemaVersion:3,exportedAt:new Date().toISOString(),records},null,2), "application/json;charset=utf-8");
+    }
+    function exportCSV() {
+      const columns = [
+        ["Verantwortlich","owner"],["Leistungsbereich","area"],["Unternehmen","company"],["Gesprächspartner","person"],["Position","position"],["E-Mail","email"],["Telefon","phone"],["Gespräch am","meetingAt"],["Gespräch geführt?","meetingHeld"],["Ergebnis","result"],["Gesprächsnotiz","meetingNotes"],["Follow-up erforderlich?","followupRequired"],["Follow-up fällig bis","_due"],["Follow-up gesendet am","followupSentAt"],["Folgetermin","nextMeetingAt"],["Projektchance?","opportunity"],["Projekt / Bedarf","projectNeed"],["Übergabe an","handoverTo"],["Übergabe erfolgt am","handoverAt"],["Nächster Schritt","nextStep"],["Frist nächster Schritt","nextStepDue"],["Abgeschlossen?","completed"],["Arbeitsstand","_status"]
+      ];
+      const quote = value => `"${String(value ?? "").replaceAll('"','""')}"`;
+      const rows = [columns.map(c => c[0]), ...records.map(r => columns.map(c => c[1] === "_due" ? dueDate(r) : c[1] === "_status" ? status(r).text : r[c[1]]))];
+      download(`claimm_EXPO_REAL_2026_Nachbereitung_${todayISO()}.csv`, "\ufeff" + rows.map(row => row.map(quote).join(";")).join("\r\n"), "text/csv;charset=utf-8");
+    }
+    async function importJSON(file) {
+      if (!file) return;
+      try {
+        const incoming = JSON.parse(await file.text());
+        if (!incoming || !Array.isArray(incoming.records) || !incoming.records.length || incoming.records.length > 5000) throw new Error("Keine gültige Nachbereitungsdatei.");
+        const newRecords = (incoming.schemaVersion || 1) < 2 ? migrateLegacyDefaults(incoming.records) : incoming.records.map(normalize);
+        if (new Set(newRecords.map(r => r.id)).size !== newRecords.length) throw new Error("Die Sicherung enthält doppelte Eintrags-IDs.");
+        if (!confirm(`Die aktuellen ${records.length} Einträge durch ${newRecords.length} Einträge aus der JSON-Sicherung ersetzen? Bitte vorher eine Sicherung herunterladen.`)) return;
+        records = newRecords;
+        records.forEach(r => { r.updatedAt = new Date().toISOString(); });
+        selectedId = records[0].id;
+        saveNow();
+        renderOwners(); renderMetrics(); renderList(); renderEditor();
+      } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); }
+      finally { el("importFile").value = ""; }
+    }
+
+    el("editorForm").addEventListener("submit", event => event.preventDefault());
+    el("editorForm").addEventListener("input", event => {
+      const field = event.target?.dataset?.field;
+      const record = currentRecord();
+      if (!field || !record) return;
+      record[field] = event.target.value;
+      record.updatedAt = new Date().toISOString();
+      queueSave();
+      renderOwners(); renderMetrics(); renderList();
+      el("editorCompany").textContent = record.company || "Neuer Eintrag";
+      el("editorSub").textContent = [record.owner,record.area].filter(Boolean).join(" · ") || "Angaben ergänzen";
+      el("editorStatus").replaceWith(badgeFor(record));
+      document.querySelector(".editor-title .badge").id = "editorStatus";
+      const due = dueDate(record);
+      el("followupDueOverride").parentElement.querySelector("small").textContent = due ? `Vorschlag: ${displayDate(due)} (zwei Werktage). Feiertage bei Bedarf anpassen.` : "Vorschlag: zwei Werktage nach dem Gespräch. Feiertage bitte selbst berücksichtigen.";
+    });
+    el("search").addEventListener("input", renderList);
+    el("ownerFilter").addEventListener("change", renderList);
+    el("statusFilter").addEventListener("change", renderList);
+    el("addButton").addEventListener("click", () => {
+      const newRecord = normalize({id:`extra-${Date.now()}-${Math.random().toString(36).slice(2,8)}`},records.length);
+      newRecord.updatedAt = new Date().toISOString();
+      records.push(newRecord);
+      selectedId = newRecord.id;
+      el("search").value = ""; el("statusFilter").value = "";
+      queueSave(); renderMetrics(); renderList(); renderEditor(); el("company").focus();
+    });
+    el("jsonButton").addEventListener("click", exportJSON);
+    el("csvButton").addEventListener("click", exportCSV);
+    el("importButton").addEventListener("click", () => el("importFile").click());
+    el("importFile").addEventListener("change", event => importJSON(event.target.files?.[0]));
+    window.addEventListener("storage", event => { if (event.key === STORAGE_KEY) { records = initialRecords(); selectedId = records.find(r => r.id === selectedId)?.id || records[0]?.id || null; renderOwners(); renderMetrics(); renderList(); renderEditor(); setSaveMessage("Daten aus anderem Tab geladen"); } });
+    renderOwners(); renderMetrics(); renderList(); renderEditor();
+    window.SPSync && SPSync.start({
+      getRecords: () => records,
+      applyRecords: merged => {
+        const editing = el("editorForm").contains(document.activeElement);
+        records = merged.map(normalize);
+        if (!records.some(r => r.id === selectedId)) selectedId = records[0]?.id || null;
+        renderOwners(); renderMetrics(); renderList();
+        if (!editing) renderEditor();
+      },
+      onStatus: setSaveMessage
+    });
+  </script>
+</body>
+</html>
